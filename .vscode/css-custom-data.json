@@ -1,0 +1,17 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "theme",
+      "description": "Defines Tailwind CSS v4 theme variables and their corresponding utilities."
+    },
+    {
+      "name": "utility",
+      "description": "Defines custom utilities in Tailwind CSS v4."
+    },
+    {
+      "name": "variant",
+      "description": "Defines custom variants in Tailwind CSS v4."
+    }
+  ]
+}

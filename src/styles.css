@@ -1,0 +1,111 @@
+@import "tailwindcss";
+@import "@fontsource-variable/fraunces/wght.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
+
+@theme {
+  --font-display: "Fraunces Variable", Palatino, "Palatino Linotype", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --color-bg: #090a0c;
+  --color-ink: #ece7df;
+  --color-muted: #9a948a;
+  --color-faint: #6f6a62;
+  --color-line: #2a2824;
+  --color-panel: #14161c;
+  --color-moment: #c4452d;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+  }
+
+  h1,
+  h2 {
+    font-optical-sizing: auto;
+    text-wrap: balance;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  button:focus-visible {
+    outline: 1px solid var(--color-ink);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+.em-grid {
+  display: grid;
+  height: 2.25rem;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+}
+
+.em-band {
+  position: relative;
+  background: var(--color-panel);
+  border-left: 1px solid var(--color-line);
+}
+
+.em-band:first-child {
+  border-left: 0;
+}
+
+.em-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding-inline: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+  white-space: nowrap;
+}
+
+.spectrum-visible {
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    #8f1d16 0%,
+    #e23b16 14%,
+    #f08a14 28%,
+    #e6c61a 40%,
+    #6fbf32 52%,
+    #149e86 64%,
+    #1a7fd4 76%,
+    #2c34c8 86%,
+    #6a2ad4 94%,
+    #8d3ad4 100%
+  );
+}
+
+.spectrum-visible .em-label {
+  color: #140c08;
+  font-weight: 500;
+}
