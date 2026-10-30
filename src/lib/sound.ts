@@ -79,20 +79,33 @@ export class SoundOut {
   }
 
   /** Synth follows the field. A mic or a track replaces it. */
+  /** Synth follows the field. A mic or a track replaces it. */
   setLevels(levels: number[], audible: boolean) {
     if (!this.ctx) return;
+    if (this.ctx.state === "suspended" && audible) {
+      void this.ctx.resume();
+    }
+
     const now = this.ctx.currentTime;
     const synth = audible && this.inputKind === "none";
+
     for (let i = 0; i < this.voices.length; i++) {
+      const level = levels[i] ?? 0;
       const body = VOICES[i].freq < 120 ? 1.4 : VOICES[i].freq < 200 ? 1.15 : 1;
-      const target = synth ? levels[i] * 0.16 * body : 0;
-      if (Math.abs(target - (this.lastTargets[i] ?? -1)) < 0.012) continue;
-      this.lastTargets[i] = target;
-      this.voices[i].gain.gain.setTargetAtTime(target, now, 0.05);
+      const target = synth ? Math.max(0, Math.min(1, level)) * 0.16 * body : 0.00001;
+
+      // Ensure gain updates smoothly without getting trapped by float hysteresis
+      const last = this.lastTargets[i] ?? -1;
+      if (Math.abs(target - last) > 0.002) {
+        this.lastTargets[i] = target;
+        this.voices[i].gain.gain.cancelScheduledValues(now);
+        this.voices[i].gain.gain.setTargetAtTime(target, now, 0.03);
+      }
     }
   }
 
-  attachMic(stream: MediaStream) {
+  async attachMic(stream: MediaStream): Promise<void> {
+    await this.ensure();
     if (!this.ctx || !this.analyser) return;
     this.stopInput();
     const node = this.ctx.createMediaStreamSource(stream);

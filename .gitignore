@@ -18,6 +18,7 @@ env.server.ts
 
 node_modules/
 .output/
+.vercel/
 dist/
 screenshots/
 .grok/session/

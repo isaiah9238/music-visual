@@ -125,3 +125,84 @@ git push
 ## License
 
 Private / personal project. Add a `LICENSE` file if you decide to open-source it.
+
+The Mermaid flowchart accurately maps the audio pipeline and UI state transitions across `see-music.tsx`, `sound.ts`, and `spectrum.ts`.
+
+To represent the complete system architecture, the diagram needs to include the **Three.js WebGL rendering layer (`Visualizer3D.tsx`)** and the **signal path down to physical shader uniforms/transforms**.
+
+---
+
+### Complete Multi-Layer Architecture Diagram
+
+```mermaid
+flowchart TD
+    subgraph INPUT["1. Signal Ingestion & Interaction"]
+        direction TB
+        KB["Keyboard (1–8) / Note Click"]
+        DEMO["Score Engine (voices.ts)"]
+        MIC["Microphone Stream"]
+        TRACK["Audio File Playback"]
+    end
+
+    subgraph AUDIO["2. Audio & Level Generation"]
+        direction TB
+        CTX["AudioContext (Web Audio API)"]
+        ANALYSER["AnalyserNode (FFT Analysis)"]
+        BANDS["8 Frequency Bands"]
+        LEVELS["Composite Note Levels (C2 → G4)"]
+        SYNTH["Synthesizer Voices (sound.ts)"]
+    end
+
+    subgraph MAPPING["3. Synesthetic Spectral Mapping (spectrum.ts)"]
+        direction TB
+        SCALAR["Chord Fullness & Power Scalar (0.0 → 1.0)"]
+        SPECTRUM["Visible Spectrum Range (700 nm Red → 400 nm Violet)"]
+        ENERGY["Photon Energy Estimate (eV)"]
+    end
+
+    subgraph OUTPUT["4. UI & Canvas Rendering"]
+        direction TB
+        CANVAS["Canvas Listening Field (draw-field.ts)"]
+        RIPPLES["Spatial Position Glows & Expanding Ripples"]
+        HUD["HUD Readouts (Color, Wavelength, Energy)"]
+    end
+
+    %% Routing
+    DEMO --> LEVELS
+    KB --> LEVELS
+    MIC --> CTX --> ANALYSER --> BANDS --> LEVELS
+    TRACK --> CTX --> ANALYSER --> BANDS --> LEVELS
+
+    LEVELS --> SCALAR
+    SCALAR --> SPECTRUM --> ENERGY
+
+    LEVELS --> CANVAS
+    ENERGY --> HUD
+    SPECTRUM --> HUD
+    SPECTRUM --> RIPPLES
+    CANVAS --> RIPPLES
+
+    LEVELS -.->|"Hear it enabled (demo/clicks)"| SYNTH
+
+# Note on 3D Engine: src/components/Visualizer3D.tsx is an isolated Three.js prototype component utilizing an audio-reactive icosahedron core and particle field. It remains in the repository as a standalone visualizer module and is not mounted in the default route.    
+```
+
+---
+
+### Key Subsystem Invariants
+
+- **Audio FFT Nyquist Decomposition:** The `AnalyserNode` frequency spectrum is partitioned into sub-bands ($20\text{--}250\text{ Hz}$ for bass, $250\text{--}2000\text{ Hz}$ for mid, and $>2000\text{ Hz}$ for treble). The low end scales the core mesh exponentially ($1.0 + \text{bass}^{1.8}$), and mid-range energy drives continuous rotation.
+
+- **Synesthetic Photon Derivation:** The composite chord density $s \in [0, 1]$ shifts the visible wavelength from deep red ($\lambda = 700\text{ nm}$) to boundary violet ($\lambda = 400\text{ nm}$). This maps dynamically to photon energy:
+
+$$E = \frac{hc}{\lambda} \approx \frac{1239.84}{\lambda\text{ (nm)}}\text{ eV}$$
+
+Yielding $1.77\text{ eV}$ for a solitary fundamental and $2.98\text{ eV}$ at full chord saturation.
+
+- **Canvas Spatial Projector:** 2D canvas transforms map note frequencies into pseudo-3D perspective space along an elliptical stage ring, spawning decaying concentric boundary ripples for active pitches while the Three.js viewport handles volumetric scene geometry.
+
+---
+
+### Immediate Action
+
+Add this diagram directly to `README.md` to document the system architecture alongside the build instructions:
